@@ -1,5 +1,5 @@
 # Hello world
-from flask import Flask, render_template
+from flask import Flask, render_template , request
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
@@ -21,12 +21,26 @@ class Todo(db.Model):
 
 
 
-@app.route("/")
+@app.route("/", methods=["GET" , "POST"])
 def hello_world():
-    return render_template('index.html')
-    # return "<p>Hello, World!</p>"
-@app.route("/products")
+    if request.method == "POST":
+        title = request.form["title"]
+        desc = request.form["desc"]
+        print(title, desc)
+
+
+        todo = Todo(Title=title , desc=desc)
+        db.session.add(todo)
+        db.session.commit()
+
+    allTodo=Todo.query.all()
+    return render_template('index.html' , allTodo=allTodo)
+
+
+@app.route("/show")
 def products():
+    allTodo=Todo.query.all()
+    print(allTodo)
     return "<p>This is products page!</p>"
 
 if __name__ == "__main__":
